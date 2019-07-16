@@ -203,6 +203,13 @@ public:
         return false;
     }
 
+    // Alternative virtual method definition used by non-taproot children classes.
+    virtual bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const
+    {
+        return false;
+    }
+
+
     virtual bool CheckLockTime(const CScriptNum& nLockTime) const
     {
          return false;
