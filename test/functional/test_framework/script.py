@@ -904,41 +904,41 @@ class TapLeaf:
         self._set_miniscript(miniscript.and_v(v_c_pk_node, miniscript.and_v(v_hash_node, older_node)))
         self.desc = TapLeaf._desc_serializer('pkhasholder', key.get_bytes().hex(), data.hex(),str(n))
 
-    def construct_csa(self, k, *args): #int, ECPubKey ...
-        keys_data = [key.get_bytes() for key in args]
-        thresh_csa_node = miniscript.thresh_csa(k, *keys_data)
+    def construct_csa(self, n, pkv):
+        keys_data = [key.get_bytes() for key in pkv]
+        thresh_csa_node = miniscript.thresh_csa(n, *keys_data)
         self._set_miniscript(thresh_csa_node)
         keys_string = [data.hex() for data in keys_data]
-        self.desc = TapLeaf._desc_serializer('csa', str(k), *keys_string)
+        self.desc = TapLeaf._desc_serializer('csa', str(n), *keys_string)
 
-    def construct_csaolder(self, n, k, *args):  #int, int, ECPubKey ...
-        keys_data = [key.get_bytes() for key in args]
-        thresh_csa_node = miniscript.thresh_csa(k, *keys_data)
+    def construct_csaolder(self, n, pkv, delay):
+        keys_data = [key.get_bytes() for key in pkv]
+        thresh_csa_node = miniscript.thresh_csa(n, *keys_data)
         v_thresh_csa_node = miniscript.v(thresh_csa_node)
-        older_node = miniscript.older(n)
+        older_node = miniscript.older(delay)
         self._set_miniscript(miniscript.and_v(v_thresh_csa_node, older_node))
         keys_string = [data.hex() for data in keys_data]
-        self.desc = TapLeaf._desc_serializer('csaolder', str(k), *keys_string, str(n))
+        self.desc = TapLeaf._desc_serializer('csaolder', str(n), *keys_string, str(delay))
 
-    def construct_csahash(self, data, k, *args): #int, 20B, ECPubKey ...
-        keys_data = [key.get_bytes() for key in args]
-        thresh_csa_node = miniscript.thresh_csa(k, *keys_data)
+    def construct_csahash(self, n, pkv, data):
+        keys_data = [key.get_bytes() for key in pkv]
+        thresh_csa_node = miniscript.thresh_csa(n, *keys_data)
         v_thresh_csa_node = miniscript.v(thresh_csa_node)
         hash_node = miniscript.ripemd160(data)
         self._set_miniscript(miniscript.and_v(v_thresh_csa_node, hash_node))
         keys_string = [data.hex() for data in keys_data]
-        self.desc = TapLeaf._desc_serializer('csahash', str(k), *keys_string, data.hex())
+        self.desc = TapLeaf._desc_serializer('csahash', str(n), *keys_string, data.hex())
 
-    def construct_csahasholder(self, n, data, k, *args): #int, 20B, int, ECPubKey ...
-        keys_data = [key.get_bytes() for key in args]
-        thresh_csa_node = miniscript.thresh_csa(k, *keys_data)
+    def construct_csahasholder(self, n, pkv, data, delay):
+        keys_data = [key.get_bytes() for key in pkv]
+        thresh_csa_node = miniscript.thresh_csa(n, *keys_data)
         v_thresh_csa_node = miniscript.v(thresh_csa_node)
         hash_node = miniscript.ripemd160(data)
         v_hash_node = miniscript.v(hash_node)
-        older_node = miniscript.older(n)
+        older_node = miniscript.older(delay)
         self._set_miniscript(miniscript.and_v(v_thresh_csa_node, miniscript.and_v(v_hash_node, older_node)))
         keys_string = [data.hex() for data in keys_data]
-        self.desc = TapLeaf._desc_serializer('csahasholder', str(k), *keys_string, data.hex(),str(n))
+        self.desc = TapLeaf._desc_serializer('csahasholder', str(n), *keys_string, data.hex(),str(delay))
 
     def _set_miniscript(self, miniscript):
         self.miniscript = miniscript
@@ -991,50 +991,50 @@ class TapLeaf:
         elif tss[:4] == 'csa(':
             expr_s = ParseDesc(tss, 'csa' ,'(' ,')')
             args = self._param_parser(expr_s)
-            k = int(args[0])
+            n = int(args[0])
             pkv = []
             for key_string in args[1:]:
                 pk = ECPubKey()
                 pk.set(bytes.fromhex(key_string))
                 pkv.append(pk)
-            self.construct_csa(k, *pkv)
+            self.construct_csa(n, pkv)
 
         elif tss[:9] == 'csaolder(':
             expr_s = ParseDesc(tss, 'csaolder' ,'(' ,')')
             args = self._param_parser(expr_s)
-            k = int(args[0])
+            n = int(args[0])
             pkv = []
             for key_string in args[1:-1]:
                 pk = ECPubKey()
                 pk.set(bytes.fromhex(key_string))
                 pkv.append(pk)
-            time = int(args[-1])
-            self.construct_csaolder(time, k, *pkv)
+            delay = int(args[-1])
+            self.construct_csaolder(n, pkv, delay)
 
         elif tss[:8] == 'csahash(':
             expr_s = ParseDesc(tss, 'csahash' ,'(' ,')')
             args = self._param_parser(expr_s)
-            k = int(args[0])
+            n = int(args[0])
             pkv = []
             for key_string in args[1:-1]:
                 pk = ECPubKey()
                 pk.set(bytes.fromhex(key_string))
                 pkv.append(pk)
             data = bytes.fromhex(args[-1])
-            self.construct_csahash(data, k, *pkv)
+            self.construct_csahash(n, pkv, data)
 
         elif tss[:13] == 'csahasholder(':
             expr_s = ParseDesc(tss, 'csahasholder' ,'(' ,')')
             args = self._param_parser(expr_s)
-            k = int(args[0])
+            n = int(args[0])
             pkv = []
             for key_string in args[1:-2]:
                 pk = ECPubKey()
                 pk.set(bytes.fromhex(key_string))
                 pkv.append(pk)
             data = bytes.fromhex(args[-2])
-            time = int(args[-1])
-            self.construct_csahasholder(time, data, k, *pkv)
+            delay = int(args[-1])
+            self.construct_csahasholder(n, pkv, data, delay)
 
         elif tss[:4] =='raw(':
             self.script = CScript(binascii.unhexlify(tss[4:-1]))
@@ -1077,7 +1077,7 @@ class TapLeaf:
                 pk.set(pubkey_b)
                 pubkey_set.append(pk)
             tapscript = TapLeaf()
-            tapscript.construct_csa(len(pubkey_set), *pubkey_set)
+            tapscript.construct_csa(n, pubkey_set)
             tapscripts.append(tapscript)
         return tapscripts
 
