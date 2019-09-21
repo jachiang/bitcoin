@@ -1063,7 +1063,7 @@ class TapLeaf:
         return True
 
     @staticmethod
-    def generate_threshold_csa(n, pubkeys):
+    def generate_threshold_csa(n, pubkeys, digest = None, delay = None):
         if n == 1 or len(pubkeys) <= n:
             raise Exception
         pubkeys_b = [pubkey.get_bytes() for pubkey in pubkeys]
@@ -1077,8 +1077,18 @@ class TapLeaf:
                 pk.set(pubkey_b)
                 pubkey_set.append(pk)
             tapscript = TapLeaf()
-            tapscript.construct_csa(n, pubkey_set)
-            tapscripts.append(tapscript)
+            if digest is not None and delay is None:
+                tapscript.construct_csahash(n, pubkey_set, digest)
+                tapscripts.append(tapscript)
+            elif digest is None and delay is not None:
+                tapscript.construct_csaolder(n, pubkey_set, delay)
+                tapscripts.append(tapscript)
+            elif digest is None and delay is None:
+                tapscript.construct_csahasholder(n, pubkey_set, digest, delay)
+                tapscripts.append(tapscript)
+            else:
+                tapscript.construct_csa(n, pubkey_set)
+                tapscripts.append(tapscript)
         return tapscripts
 
 class TapTree:
