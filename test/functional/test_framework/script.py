@@ -1062,24 +1062,34 @@ class TapLeaf:
     def __gt__(self, other):
         return True
 
-    @staticmethod
-    def generate_threshold_csa(k, pubkeys):
-        if k == 1 or len(pubkeys) <= k:
-            raise Exception
-        pubkeys_b = [pubkey.get_bytes() for pubkey in pubkeys]
-        pubkeys_b.sort()
-        pubkey_b_sets = list(itertools.combinations(iter(pubkeys_b), k))
-        tapscripts = []
-        for pubkey_b_set in pubkey_b_sets:
-            pubkey_set = []
-            for pubkey_b in pubkey_b_set:
-                pk = ECPubKey()
-                pk.set(pubkey_b)
-                pubkey_set.append(pk)
-            tapscript = TapLeaf()
+@staticmethod
+def generate_threshold_csa(k, pubkeys, digest = None, delay = None):
+    if k == 1 or len(pubkeys) <= k:
+        raise Exception
+    pubkeys_b = [pubkey.get_bytes() for pubkey in pubkeys]
+    pubkeys_b.sort()
+    pubkey_b_sets = list(itertools.combinations(iter(pubkeys_b), k))
+    tapscripts = []
+    for pubkey_b_set in pubkey_b_sets:
+        pubkey_set = []
+        for pubkey_b in pubkey_b_set:
+            pk = ECPubKey()
+            pk.set(pubkey_b)
+            pubkey_set.append(pk)
+        tapscript = TapLeaf()
+        if digest is not None and delay is None:
+            tapscript.construct_csahash(k, pubkey_set, digest)
+            tapscripts.append(tapscript)
+        elif digest is None and delay is not None:
+            tapscript.construct_csaolder(k, pubkey_set, delay)
+            tapscripts.append(tapscript)
+        elif digest is None and delay is None:
+            tapscript.construct_csahasholder(k, pubkey_set, digest, delay)
+            tapscripts.append(tapscript)
+        else:
             tapscript.construct_csa(k, pubkey_set)
             tapscripts.append(tapscript)
-        return tapscripts
+    return tapscripts
 
 class TapTree:
     def __init__(self):
