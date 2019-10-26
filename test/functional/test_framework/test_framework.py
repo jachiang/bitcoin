@@ -270,6 +270,8 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
             h.flush()
             h.close()
             self.log.removeHandler(h)
+
+        self.nodes.clear()
         return exit_code
 
     # Methods to override in subclass test scripts.
