@@ -164,7 +164,7 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
         self.options = parser.parse_args()
 
     def setup(self):
-        """Call this method to startup the test-framework object with options set."""
+        """Call this method to start up the test framework object with options set."""
 
         PortSeed.n = self.options.port_seed
 
@@ -223,7 +223,7 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
         self.success = TestStatus.PASSED
 
     def shutdown(self):
-        """Call this method to shutdown the test-framework object."""
+        """Call this method to shut down the test framework object."""
 
         if self.success == TestStatus.FAILED and self.options.pdbonfailure:
             print("Testcase failed. Attaching python debugger. Enter ? for help")

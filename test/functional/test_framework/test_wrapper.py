@@ -1,15 +1,7 @@
 #!/usr/bin/env python3
-# Copyright (c) 2014-2019 The Bitcoin Core developers
+# Copyright (c) 2019 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
-"""Wrapper Class for BitcoinTestFramework.
-
-The TestWrapper class extends the BitcoinTestFramework
-rpc & daemon process management functionality to external
-python environments.
-
-It is a singleton class, which ensures that users only
-start a single TestWrapper at a time."""
 
 import argparse
 from os import getpid
@@ -18,9 +10,16 @@ from os.path import abspath, join
 from test_framework.test_framework import BitcoinTestFramework
 
 class TestWrapper:
+    """Wrapper Class for BitcoinTestFramework.
+
+    The TestWrapper class extends the BitcoinTestFramework
+    rpc & daemon process management functionality to external
+    python environments.
+
+    It is a singleton class, which ensures that users only
+    start a single TestWrapper at a time."""
 
     class __TestWrapper(BitcoinTestFramework):
-
         def set_test_params(self):
             pass
 
@@ -28,7 +27,6 @@ class TestWrapper:
             pass
 
         def setup(self, **kwargs):
-
             if self.running:
                 print("TestWrapper is already running!")
                 return
@@ -71,6 +69,8 @@ class TestWrapper:
     instance = None
 
     def __new__(cls):
+        # Implementation enforces singleton pattern,
+        # and will return existing instance if available.
         if not TestWrapper.instance:
             TestWrapper.instance = TestWrapper.__TestWrapper()
             TestWrapper.instance.running = False
