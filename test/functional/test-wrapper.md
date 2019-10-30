@@ -7,9 +7,9 @@ The TestWrapper submodule extends the `BitcoinTestFramework` functionality to ex
 
 * Manage regtest bitcoind subprocesses.
 * Access RPC interfaces of the underlying bitcoind instances.
-* Log events to functional the test logging utility.
+* Log events to the functional test logging utility.
 
-The `TestWrapper` can be useful in interactive environments where it is necessary to extend the object lifetime of the underlying `BitcoinTestFramework` between user inputs. Such environments include the Python3 command-line interpreter or [Jupyter](https://jupyter.org/) notebooks running a Python3 kernel,
+The `TestWrapper` can be useful in interactive environments where it is necessary to extend the object lifetime of the underlying `BitcoinTestFramework` between user inputs. Such environments include the Python3 command line interpreter or [Jupyter](https://jupyter.org/) notebooks running a Python3 kernel.
 
 ## 1. Requirements
 
@@ -35,7 +35,7 @@ The TestWrapper inherits all BitcoinTestFramework members and methods, such as:
 * `TestWrapper.nodes[index].rpc_method()`
 * `TestWrapper.log.info("Custom log message")`
 
-The following sections demonstrate how to initialize, run and shutdown a TestWrapper object.
+The following sections demonstrate how to initialize, run, and shut down a TestWrapper object.
 
 ## 3. Initializing a TestWrapper object
 
@@ -47,7 +47,7 @@ The following sections demonstrate how to initialize, run and shutdown a TestWra
 The TestWrapper forwards all functional test parameters of the parent Bitcoin TestFramework object. The full set of argument keywords which can be used to initialize the TestWrapper can be found [here](../test/functional/test_framework/test_wrapper.py).
 
 **Note: Running multiple instances of TestWrapper is not allowed.**
-This also ensures that logging remains consolidated in the same temporary folder. If you need more bitcoind nodes than set by default (1), simply increase the `num_nodes` parameter during setup.
+Running a single process also ensures that logging remains consolidated in the same temporary folder. If you need more bitcoind nodes than set by default (1), simply increase the `num_nodes` parameter during setup.
 
 ```
 >>> test2 = TestWrapper()
@@ -57,7 +57,7 @@ TestWrapper is already running!
 
 ## 4. Interacting with the TestWrapper
 
-Unlike the BitcoinTestFramework class, the TestWrapper keeps the underlying Bitcoind subprocesses (nodes) and logging utilities running, until the user explicitly shuts down the TestWrapper object.
+Unlike the BitcoinTestFramework class, the TestWrapper keeps the underlying Bitcoind subprocesses (nodes) and logging utilities running until the user explicitly shuts down the TestWrapper object.
 
 During the time between the `setup` and `shutdown` calls, all `bitcoind` node processes and BitcoinTestFramework convenience methods can be accessed interactively.
 
@@ -97,7 +97,7 @@ We can also log custom events to the logger.
 20XX-XX-XXTXX:XX:XX.XXXXXXX TestFramework.node0 (INFO): Successfully mined regtest chain!
 ```
 
-**Note: Please also consider the functional test [readme](../test/functional/README.md), which provides an overview of the test-framework**. Modules such as [key.py](../test/functional/test_framework/key.py), [script.py](../test/functional/test_framework/script.py) and [messages.py](../test/functional/test_framework/messages.py) are especially useful in constructing objects which can be passed to the bitcoind nodes managed by a running TestWrapper object.
+**Note: Please also consider the functional test [readme](../test/functional/README.md), which provides an overview of the test-framework**. Modules such as [key.py](../test/functional/test_framework/key.py), [script.py](../test/functional/test_framework/script.py) and [messages.py](../test/functional/test_framework/messages.py) are particularly useful in constructing objects which can be passed to the bitcoind nodes managed by a running TestWrapper object.
 
 ## 5. Shutting the TestWrapper down
 
