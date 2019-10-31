@@ -55,6 +55,13 @@ class TestWrapper:
                 super().shutdown()
                 self.running = False
 
+        def reset(self):
+            if self.running:
+                print("Shutdown TestWrapper before resetting!")
+            else:
+                self.num_nodes = None
+                super().__init__()
+
     instance = None
 
     def __new__(cls):
