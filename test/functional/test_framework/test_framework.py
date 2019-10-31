@@ -273,6 +273,10 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
             h.flush()
             h.close()
             self.log.removeHandler(h)
+        rpc_logger = logging.getLogger("BitcoinRPC")
+        for h in list(rpc_logger.handlers):
+            h.flush()
+            rpc_logger.removeHandler(h)
         if cleanup_tree_on_exit:
             shutil.rmtree(self.options.tmpdir)
 
