@@ -266,6 +266,10 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
             self.log.error("Test failed. Test logging available at %s/test_framework.log", self.options.tmpdir)
             self.log.error("Hint: Call {} '{}' to consolidate all logs".format(os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../combine_logs.py"), self.options.tmpdir))
             exit_code = TEST_EXIT_FAILED
+        # Logging.shutdown will flush & close but not remove the stream and
+        # filehandlers, so we do it explicitly. Handlers are removed so the
+        # next test run can apply different log handler settings.
+        # See: https://docs.python.org/3/library/logging.html#logging.shutdown
         for h in list(self.log.handlers):
             h.flush()
             h.close()
