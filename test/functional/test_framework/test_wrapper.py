@@ -31,30 +31,19 @@ class TestWrapper:
                 print("TestWrapper is already running!")
                 return
 
-            self.setup_clean_chain = kwargs.get('setup_clean_chain',True)
+            # Num_nodes parameter must be set
+            # by BitcoinTestFramework child class.
             self.num_nodes = kwargs.get('num_nodes', 1)
-            self.network_thread = kwargs.get('network_thread', None)
-            self.rpc_timeout = kwargs.get('rpc_timeout', 60)
-            self.supports_cli = kwargs.get('supports_cli', False)
-            self.bind_to_localhost_only = kwargs.get('bind_to_localhost_only', True)
+            kwargs.pop('num_nodes', None)
 
-            self.options = argparse.Namespace
-            self.options.nocleanup = kwargs.get('nocleanup', False)
-            self.options.noshutdown = kwargs.get('noshutdown', False)
-            self.options.cachedir = kwargs.get('cachedir', abspath(join(__file__ ,"../../../..") + "/test/cache"))
-            self.options.tmpdir = kwargs.get('tmpdir', None)
-            self.options.loglevel = kwargs.get('loglevel', 'INFO')
-            self.options.trace_rpc = kwargs.get('trace_rpc', False)
-            self.options.port_seed = kwargs.get('port_seed', getpid())
-            self.options.coveragedir = kwargs.get('coveragedir', None)
-            self.options.configfile = kwargs.get('configfile', abspath(join(__file__ ,"../../../..") + "/test/config.ini"))
-            self.options.pdbonfailure = kwargs.get('pdbonfailure', False)
-            self.options.usecli = kwargs.get('usecli', False)
-            self.options.perf = kwargs.get('perf', False)
-            self.options.randomseed = kwargs.get('randomseed', None)
-
-            self.options.bitcoind = kwargs.get('bitcoind', abspath(join(__file__ ,"../../../..") +  "/src/bitcoind"))
-            self.options.bitcoincli = kwargs.get('bitcoincli', None)
+            # User parameters override default values.
+            for key, value in kwargs.items():
+                if hasattr(self, key):
+                    setattr(self, key, value)
+                elif hasattr(self.options, key):
+                    setattr(self.options, key, value)
+                else:
+                    raise KeyError(key + " not a valid parameter key")
 
             super().setup()
             self.running = True
